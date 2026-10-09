@@ -1,0 +1,6 @@
+
+# Copy this file to config/spotify.properties
+# Register your application in the Spotify Developer Dashboard.
+
+spotify.client.id=YOUR_SPOTIFY_CLIENT_ID
+spotify.redirect.uri=http://127.0.0.1:8888/callback

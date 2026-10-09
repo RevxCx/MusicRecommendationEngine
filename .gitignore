@@ -1,0 +1,11 @@
+target/
+*.class
+*.log
+data/*.db
+data/*.db-shm
+data/*.db-wal
+config/spotify.properties
+.env
+.idea/
+.vscode/
+.env.*
