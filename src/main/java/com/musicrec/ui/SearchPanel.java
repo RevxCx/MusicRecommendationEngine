@@ -1,4 +1,3 @@
-
 package com.musicrec.ui;
 
 import com.musicrec.model.Artist;
@@ -22,8 +21,7 @@ public class SearchPanel extends JPanel {
     private final DefaultListModel<SpotifyTrack> results =
             new DefaultListModel<>();
     private final JList<SpotifyTrack> resultList = new JList<>(results);
-    private final JLabel status =
-            new JLabel("Connect Spotify to begin searching.");
+    private final JLabel status = new JLabel("Connect Spotify to search.");
     private final JButton searchButton = new JButton("Search");
     private final JButton saveButton = new JButton("Save to Library");
     private final JButton favoriteButton = new JButton("Add to Favorites");
@@ -31,47 +29,60 @@ public class SearchPanel extends JPanel {
     public SearchPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
 
-        setLayout(new BorderLayout(15, 20));
-        setBackground(new Color(18, 18, 18));
+        setLayout(new BorderLayout(18, 20));
+        setBackground(UiStyle.BG);
         setBorder(new EmptyBorder(30, 35, 30, 35));
 
-        JLabel heading = new JLabel("Search Spotify");
-        heading.setFont(new Font("SansSerif", Font.BOLD, 28));
-        heading.setForeground(Color.WHITE);
+        JLabel heading = new JLabel("Find your next favorite");
+        heading.setFont(new Font("SansSerif", Font.BOLD, 30));
+        heading.setForeground(UiStyle.TEXT);
 
-        searchField.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        JLabel subtitle = new JLabel(
+                "Search Spotify by track, artist, or album."
+        );
+        subtitle.setForeground(UiStyle.MUTED);
+
+        UiStyle.textField(searchField);
         searchField.setToolTipText("Enter a song or artist");
 
+        UiStyle.primaryButton(searchButton);
+        UiStyle.button(saveButton);
+        UiStyle.button(favoriteButton);
+
         JPanel searchBar = new JPanel(new BorderLayout(10, 0));
-        searchBar.setBackground(getBackground());
+        searchBar.setOpaque(false);
         searchBar.add(searchField, BorderLayout.CENTER);
         searchBar.add(searchButton, BorderLayout.EAST);
 
-        JPanel top = new JPanel(new BorderLayout(0, 18));
-        top.setBackground(getBackground());
-        top.add(heading, BorderLayout.NORTH);
-        top.add(searchBar, BorderLayout.CENTER);
+        JPanel top = new JPanel();
+        top.setOpaque(false);
+        top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
+        top.add(heading);
+        top.add(Box.createVerticalStrut(7));
+        top.add(subtitle);
+        top.add(Box.createVerticalStrut(20));
+        top.add(searchBar);
 
-        resultList.setBackground(new Color(30, 30, 30));
-        resultList.setForeground(Color.WHITE);
+        resultList.setBackground(UiStyle.PANEL);
+        resultList.setForeground(UiStyle.TEXT);
         resultList.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        resultList.setFixedCellHeight(55);
+        resultList.setFixedCellHeight(58);
         resultList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         resultList.setCellRenderer((list, track, index, selected, focus) -> {
             JLabel label = new JLabel(
-                    track.title() + "  —  " + track.artist()
-                            + "  |  " + track.album()
+                    "♫   " + track.title() + "   —   "
+                            + track.artist() + "   ·   " + track.album()
             );
             label.setOpaque(true);
-            label.setBorder(new EmptyBorder(8, 10, 8, 10));
+            label.setBorder(new EmptyBorder(10, 14, 10, 14));
             label.setBackground(selected
-                    ? new Color(45, 90, 60) : new Color(30, 30, 30));
-            label.setForeground(Color.WHITE);
+                    ? UiStyle.ACCENT_DARK : UiStyle.PANEL);
+            label.setForeground(UiStyle.TEXT);
             return label;
         });
 
-        status.setForeground(Color.LIGHT_GRAY);
+        status.setForeground(UiStyle.MUTED);
         saveButton.setEnabled(false);
         favoriteButton.setEnabled(false);
 
@@ -79,7 +90,6 @@ public class SearchPanel extends JPanel {
             if (!e.getValueIsAdjusting()) {
                 boolean enabled = resultList.getSelectedValue() != null
                         && mainFrame.getSpotifyToken() != null;
-
                 saveButton.setEnabled(enabled);
                 favoriteButton.setEnabled(enabled);
             }
@@ -91,17 +101,17 @@ public class SearchPanel extends JPanel {
         favoriteButton.addActionListener(e -> saveSelectedTrack(true));
 
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        actions.setBackground(getBackground());
+        actions.setOpaque(false);
         actions.add(saveButton);
         actions.add(favoriteButton);
 
         JPanel bottom = new JPanel(new BorderLayout(10, 8));
-        bottom.setBackground(getBackground());
+        bottom.setOpaque(false);
         bottom.add(status, BorderLayout.CENTER);
-        bottom.add(actions, BorderLayout.EAST);
+        bottom.add(actions, BorderLayout.SOUTH);
 
         add(top, BorderLayout.NORTH);
-        add(new JScrollPane(resultList), BorderLayout.CENTER);
+        add(UiStyle.scrollPane(resultList), BorderLayout.CENTER);
         add(bottom, BorderLayout.SOUTH);
     }
 
@@ -115,7 +125,7 @@ public class SearchPanel extends JPanel {
         }
 
         if (token == null) {
-            status.setText("Connect Spotify first using the sidebar.");
+            status.setText("Connect Spotify using the sidebar first.");
             return;
         }
 
@@ -137,13 +147,12 @@ public class SearchPanel extends JPanel {
 
                 try {
                     List<SpotifyTrack> tracks = get();
-
                     for (SpotifyTrack track : tracks) {
                         results.addElement(track);
                     }
 
                     status.setText(tracks.isEmpty()
-                            ? "No tracks found."
+                            ? "No tracks found. Try another search."
                             : tracks.size() + " tracks found.");
                 } catch (Exception e) {
                     Throwable cause = e.getCause() != null
@@ -177,20 +186,9 @@ public class SearchPanel extends JPanel {
                 ));
 
                 Song song = songs.saveSong(new Song(
-                        0,
-                        track.id(),
-                        track.title(),
-                        artist.getId(),
-                        track.album(),
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        track.spotifyUrl(),
+                        0, track.id(), track.title(), artist.getId(),
+                        track.album(), null, null, null, null, null,
+                        null, null, null, track.spotifyUrl(),
                         track.artworkUrl()
                 ));
 
@@ -218,10 +216,8 @@ public class SearchPanel extends JPanel {
                             ? e.getCause() : e;
                     status.setText("Save failed: " + cause.getMessage());
                 } finally {
-                    boolean enabled =
-                            resultList.getSelectedValue() != null
-                                    && mainFrame.getSpotifyToken() != null;
-
+                    boolean enabled = resultList.getSelectedValue() != null
+                            && mainFrame.getSpotifyToken() != null;
                     saveButton.setEnabled(enabled);
                     favoriteButton.setEnabled(enabled);
                 }

@@ -10,12 +10,6 @@ import java.sql.SQLException;
 
 public class ProfilePanel extends JPanel {
 
-    private static final Color BG = new Color(18, 18, 18);
-    private static final Color CARD = new Color(35, 35, 35);
-    private static final Color GREEN = new Color(30, 215, 96);
-    private static final Color TEXT = new Color(245, 245, 245);
-    private static final Color MUTED = new Color(175, 175, 175);
-
     private final User user;
 
     private final JComboBox<String> genre = new JComboBox<>(
@@ -41,103 +35,118 @@ public class ProfilePanel extends JPanel {
     public ProfilePanel(User user) {
         this.user = user;
 
-        setLayout(new BorderLayout(20, 20));
-        setBackground(BG);
+        setLayout(new BorderLayout(22, 22));
+        setBackground(UiStyle.BG);
         setBorder(new EmptyBorder(30, 35, 30, 35));
 
-        JLabel heading = new JLabel("Your profile");
-        heading.setForeground(TEXT);
-        heading.setFont(new Font("SansSerif", Font.BOLD, 28));
+        JLabel heading = UiStyle.heading("Your listening profile", 30);
+        JLabel subtitle = UiStyle.muted(
+                "Tune your preferences to personalize your discoveries."
+        );
 
-        JLabel subtitle = new JLabel(
-                "Customize your music taste and recommendations");
-        subtitle.setForeground(MUTED);
-        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        JPanel titlePanel = new JPanel();
+        titlePanel.setOpaque(false);
+        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
+        titlePanel.add(heading);
+        titlePanel.add(Box.createVerticalStrut(8));
+        titlePanel.add(subtitle);
 
-        JPanel titles = new JPanel();
-        titles.setOpaque(false);
-        titles.setLayout(new BoxLayout(titles, BoxLayout.Y_AXIS));
-        titles.add(heading);
-        titles.add(Box.createVerticalStrut(7));
-        titles.add(subtitle);
+        JPanel intro = UiStyle.card();
+        intro.setLayout(new BorderLayout(12, 5));
 
-        JPanel form = new JPanel(new GridLayout(0, 2, 18, 20));
-        form.setBackground(CARD);
-        form.setBorder(new EmptyBorder(25, 25, 25, 25));
+        JLabel icon = new JLabel("♫");
+        icon.setFont(new Font("SansSerif", Font.BOLD, 34));
+        icon.setForeground(UiStyle.ACCENT);
 
-        addField(form, "Name", createNameField());
-        addField(form, "Preferred genre", genre);
-        addField(form, "Preferred mood", mood);
-        addField(form, "Preferred language", language);
-        addField(form, "Preferred energy", energy);
+        JPanel introText = new JPanel();
+        introText.setOpaque(false);
+        introText.setLayout(new BoxLayout(introText, BoxLayout.Y_AXIS));
+        introText.add(UiStyle.heading(user.getName(), 18));
+        introText.add(Box.createVerticalStrut(5));
+        introText.add(UiStyle.muted(
+                "Your taste. Your soundtrack. Your discovery."
+        ));
+
+        intro.add(icon, BorderLayout.WEST);
+        intro.add(introText, BorderLayout.CENTER);
+
+        JPanel form = UiStyle.card();
+        form.setLayout(new GridBagLayout());
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(12, 8, 12, 8);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1;
+        c.gridx = 0;
+        c.gridwidth = 2;
+
+        JLabel formHeading = UiStyle.heading("Taste preferences", 19);
+        form.add(formHeading, c);
+
+        c.gridwidth = 1;
+        c.weightx = 0.35;
+
+        addField(form, c, 1, "Preferred genre", genre);
+        addField(form, c, 2, "Preferred mood", mood);
+        addField(form, c, 3, "Preferred language", language);
+        addField(form, c, 4, "Preferred energy", energy);
 
         select(genre, user.getPreferredGenre());
         select(mood, user.getPreferredMood());
         select(language, user.getPreferredLanguage());
         select(energy, user.getPreferredEnergy());
 
-        styleCombo(genre);
-        styleCombo(mood);
-        styleCombo(language);
-        styleCombo(energy);
+        UiStyle.comboBox(genre);
+        UiStyle.comboBox(mood);
+        UiStyle.comboBox(language);
+        UiStyle.comboBox(energy);
 
-        JButton save = new JButton("Save preferences");
-        save.setFont(new Font("SansSerif", Font.BOLD, 14));
-        save.setForeground(Color.BLACK);
-        save.setBackground(GREEN);
-        save.setFocusPainted(false);
-        save.setBorder(new EmptyBorder(12, 20, 12, 20));
-        save.setCursor(Cursor.getPredefinedCursor(
-                Cursor.HAND_CURSOR));
+        JButton save = new JButton("Save preferences  →");
+        UiStyle.primaryButton(save);
         save.addActionListener(e -> saveProfile());
 
-        status.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        status.setForeground(MUTED);
+        status.setForeground(UiStyle.MUTED);
+        status.setFont(new Font("SansSerif", Font.PLAIN, 13));
 
-        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 8));
+        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
         bottom.setOpaque(false);
         bottom.add(save);
         bottom.add(Box.createHorizontalStrut(15));
         bottom.add(status);
 
-        JPanel center = new JPanel(new BorderLayout(0, 20));
-        center.setOpaque(false);
-        center.add(titles, BorderLayout.NORTH);
-        center.add(form, BorderLayout.CENTER);
+        JPanel content = new JPanel();
+        content.setOpaque(false);
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.add(titlePanel);
+        content.add(Box.createVerticalStrut(22));
+        content.add(intro);
+        content.add(Box.createVerticalStrut(18));
+        content.add(form);
 
-        add(center, BorderLayout.CENTER);
+        add(UiStyle.scrollPane(content), BorderLayout.CENTER);
         add(bottom, BorderLayout.SOUTH);
     }
 
-    private JTextField createNameField() {
-        JTextField field = new JTextField(user.getName());
-        field.setEditable(false);
-        field.setToolTipText("Your profile name");
-        return field;
-    }
-
     private void addField(
-            JPanel panel, String label, JComponent input) {
+            JPanel panel, GridBagConstraints c,
+            int row, String label, JComponent input) {
 
-        JLabel text = new JLabel(label);
-        text.setForeground(TEXT);
-        text.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        c.gridy = row;
+        c.gridx = 0;
+        c.weightx = 0.35;
 
-        panel.add(text);
-        panel.add(input);
-    }
+        JLabel name = new JLabel(label);
+        name.setForeground(UiStyle.TEXT);
+        name.setFont(new Font("SansSerif", Font.BOLD, 13));
+        panel.add(name, c);
 
-    private void styleCombo(JComboBox<String> box) {
-        box.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        box.setBackground(new Color(48, 48, 48));
-        box.setForeground(TEXT);
-        box.setFocusable(false);
+        c.gridx = 1;
+        c.weightx = 0.65;
+        panel.add(input, c);
     }
 
     private void select(JComboBox<String> box, String value) {
-        if (value == null || value.isBlank()) {
-            return;
-        }
+        if (value == null || value.isBlank()) return;
 
         for (int i = 0; i < box.getItemCount(); i++) {
             if (box.getItemAt(i).equalsIgnoreCase(value)) {
@@ -146,7 +155,6 @@ public class ProfilePanel extends JPanel {
             }
         }
 
-        // Preserve older saved preferences that aren't in the new list.
         box.addItem(value);
         box.setSelectedItem(value);
     }
@@ -160,25 +168,16 @@ public class ProfilePanel extends JPanel {
         try {
             new UserRepository().save(user);
 
-            status.setForeground(GREEN);
-            status.setText("Preferences saved successfully!");
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Your preferences have been saved.\n"
-                            + "Open Recommendations and click "
-                            + "\"Discover More\" to view the updated ranking.",
-                    "Profile Updated",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
+            status.setForeground(UiStyle.ACCENT);
+            status.setText("✓ Preferences saved");
 
         } catch (SQLException e) {
-            status.setForeground(new Color(255, 100, 100));
-            status.setText("Unable to save preferences.");
+            status.setForeground(UiStyle.RED);
+            status.setText("Could not save preferences.");
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Unable to save preferences: " + e.getMessage(),
+                    "Unable to save preferences:\n" + e.getMessage(),
                     "Database Error",
                     JOptionPane.ERROR_MESSAGE
             );

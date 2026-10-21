@@ -1,4 +1,3 @@
-
 package com.musicrec.ui;
 
 import com.musicrec.model.Song;
@@ -14,8 +13,8 @@ import java.util.List;
 
 public class FavoritesPanel extends JPanel {
 
-    private static final Color BG = new Color(18, 18, 18);
-    private static final Color PANEL = new Color(30, 30, 30);
+    private static final Color BG = UiStyle.BG;
+    private static final Color PANEL = UiStyle.PANEL;
 
     private final User user;
     private final DefaultListModel<Song> model = new DefaultListModel<>();
@@ -35,9 +34,11 @@ public class FavoritesPanel extends JPanel {
         heading.setForeground(Color.WHITE);
 
         JButton refresh = new JButton("Refresh");
+        UiStyle.button(refresh);
         refresh.addActionListener(e -> refreshFavorites());
 
         JButton remove = new JButton("Remove Favorite");
+        UiStyle.button(remove);
         remove.addActionListener(e -> removeSelected());
 
         JPanel top = new JPanel(new BorderLayout());
@@ -82,7 +83,7 @@ public class FavoritesPanel extends JPanel {
         footer.add(actions, BorderLayout.SOUTH);
 
         add(top, BorderLayout.NORTH);
-        add(new JScrollPane(list), BorderLayout.CENTER);
+        add(UiStyle.scrollPane(list), BorderLayout.CENTER);
         add(footer, BorderLayout.SOUTH);
 
         refreshFavorites();

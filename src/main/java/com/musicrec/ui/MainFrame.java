@@ -1,4 +1,3 @@
-
 package com.musicrec.ui;
 
 import com.musicrec.model.User;
@@ -12,9 +11,9 @@ import java.sql.SQLException;
 
 public class MainFrame extends JFrame {
 
-    private static final Color BG = new Color(18, 18, 18);
-    private static final Color SIDEBAR = new Color(25, 25, 25);
-    private static final Color GREEN = new Color(30, 215, 96);
+    private static final Color BG = UiStyle.BG;
+    private static final Color SIDEBAR = UiStyle.SIDEBAR;
+    private static final Color GREEN = UiStyle.ACCENT;
 
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel content = new JPanel(cardLayout);
@@ -32,25 +31,25 @@ public class MainFrame extends JFrame {
         this.user = user;
 
         setTitle("Music Recommendation Engine");
-        setSize(1150, 750);
-        setMinimumSize(new Dimension(900, 600));
+        setSize(1280, 820);
+        setMinimumSize(new Dimension(980, 650));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
         getContentPane().setBackground(BG);
 
         JPanel sidebar = new JPanel();
-        sidebar.setPreferredSize(new Dimension(220, 0));
+        sidebar.setPreferredSize(new Dimension(235, 0));
         sidebar.setBackground(SIDEBAR);
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
-        sidebar.setBorder(BorderFactory.createEmptyBorder(25, 15, 20, 15));
+        sidebar.setBorder(BorderFactory.createEmptyBorder(28, 17, 22, 17));
 
         JLabel logo = new JLabel("♫  MUSICREC");
-        logo.setFont(new Font("SansSerif", Font.BOLD, 22));
+        logo.setFont(new Font("SansSerif", Font.BOLD, 23));
         logo.setForeground(GREEN);
         logo.setAlignmentX(Component.LEFT_ALIGNMENT);
         sidebar.add(logo);
-        sidebar.add(Box.createVerticalStrut(35));
+        sidebar.add(Box.createVerticalStrut(42));
 
         addNavigation(sidebar, "Home", "home");
         addNavigation(sidebar, "Search Music", "search");
@@ -66,7 +65,7 @@ public class MainFrame extends JFrame {
         sidebar.add(Box.createVerticalStrut(10));
 
         connectButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        connectButton.setFocusPainted(false);
+        UiStyle.primaryButton(connectButton);
         connectButton.setCursor(
                 Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
         );
@@ -104,10 +103,10 @@ public class MainFrame extends JFrame {
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setForeground(Color.WHITE);
         button.setBackground(SIDEBAR);
-        button.setFont(new Font("SansSerif", Font.PLAIN, 15));
-        button.setBorder(
-                BorderFactory.createEmptyBorder(10, 12, 10, 5)
-        );
+        button.setOpaque(true);
+        button.setFont(new Font("SansSerif", Font.BOLD, 14));
+        button.setBorder(BorderFactory.createEmptyBorder(12, 14, 12, 8));
+        button.setBorderPainted(false);
         button.setFocusPainted(false);
         button.setCursor(
                 Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
@@ -120,7 +119,7 @@ public class MainFrame extends JFrame {
         });
 
         sidebar.add(button);
-        sidebar.add(Box.createVerticalStrut(8));
+        sidebar.add(Box.createVerticalStrut(6));
     }
 
     private void connectSpotify() {
